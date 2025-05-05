@@ -1,4 +1,4 @@
-#BitCoinPrice
+## BitCoinPrice
 Em construção
 - tela de loading
 - tela de erro
