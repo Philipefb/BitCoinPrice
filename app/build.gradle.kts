@@ -44,6 +44,7 @@ dependencies {
     implementation("com.patrykandpatrick.vico:compose-m3:1.10.0")
     implementation("com.patrykandpatrick.vico:compose:1.13.0")
     implementation("com.patrykandpatrick.vico:core:1.13.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.2")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)

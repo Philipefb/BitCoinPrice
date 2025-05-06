@@ -9,18 +9,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.bitcoinprice.viewmodel.MarketViewModel
 import androidx.compose.ui.text.font.FontWeight
-import com.patrykandpatrick.vico.compose.axis.horizontal.rememberBottomAxis
-import com.patrykandpatrick.vico.compose.axis.vertical.rememberStartAxis
-import com.patrykandpatrick.vico.compose.chart.line.lineChart
-import com.patrykandpatrick.vico.compose.style.ChartStyle
-import com.patrykandpatrick.vico.core.chart.line.LineChart
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+
 
 import java.util.Date
 
@@ -30,15 +30,42 @@ fun MainScreen(viewModel: MarketViewModel) {
     println("teste")
     println(viewModel.marketPrice.value)
 
+    val options = listOf("3d", "4d", "7d", "1m", "2m")
+    var selected by remember { mutableStateOf("1m") }
+
+
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
         val totalHeight = maxHeight
 
-        Column(modifier = Modifier
-            .height(totalHeight * 0.7f)
-            .padding(16.dp)) {
-            Text("Preço do Bitcoin nas últimas 4 semanas",
+        Column(
+            modifier = Modifier
+                .height(totalHeight * 0.7f)
+                .padding(10.dp)
+        ) {
+            Column(modifier = Modifier.padding(16.dp)
+                .height(totalHeight * 0.1f)) {
+                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    options.forEach { option ->
+                        Button(
+                            onClick = {
+                                selected = option
+                                viewModel.loadMarketPrice(option)
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = if (selected == option) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary
+                            )
+                        ) {
+                            Text(option.uppercase())
+                        }
+                    }
+                }
+            }
+
+            Text(
+                "Preço do Bitcoin nas últimas 4 semanas",
                 fontSize = 20.sp,
-                modifier = Modifier.padding(12.dp))
+                modifier = Modifier.padding(6.dp)
+            )
 
             LazyColumn(modifier = Modifier.padding(16.dp)) {
                 items(data) { item ->
@@ -73,15 +100,15 @@ fun MainScreen(viewModel: MarketViewModel) {
         ) {
             Text("About", fontSize = 20.sp, fontWeight = FontWeight.Bold)
 
-            data[0].let {
-                if (it != null) {
-                    Text(
-                        text = it.description,
-                        fontSize = 14.sp,
-                        modifier = Modifier.padding(top = 8.dp)
-                    )
-                }
-            }
+//            data[0].let {
+//                if (it != null) {
+//                    Text(
+//                        text = it.description,
+//                        fontSize = 14.sp,
+//                        modifier = Modifier.padding(top = 8.dp)
+//                    )
+//                }
+//            }
         }
     }
 }

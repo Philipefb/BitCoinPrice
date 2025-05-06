@@ -1,23 +1,22 @@
 package com.example.bitcoinprice.data.repository
 
 
+import android.util.Log
 import com.example.bitcoinprice.data.local.database.AppDatabase
 import com.example.bitcoinprice.data.local.entity.MarketPriceEntity
 import com.example.bitcoinprice.data.network.RetrofitClient
-import kotlin.math.log
 
 class MarketRepository(private val db: AppDatabase) {
     private val dao = db.marketPriceDao()
 
-    suspend fun getMarketPrices(): List<MarketPriceEntity> {
+    suspend fun getMarketPrices(range: String): List<MarketPriceEntity> {
         val cached = dao.getAll()
-        if (cached.isNotEmpty()) {
-            println("há dados no banco pegando localmente")
+        if (cached.isNotEmpty() && range != "8weeks") {
+            Log.d("MarketRepository.kt", "há dados no banco pegando localmente")
             return cached
         }
 
-        val response = RetrofitClient.api.getMarketPrice()
-        println("Banco está vazio pegando os dados da internet")
+        val response = RetrofitClient.api.getMarketPrice(range)
         val coord = response.values.map {
             MarketPriceEntity(
                 x = it.x,
@@ -26,7 +25,9 @@ class MarketRepository(private val db: AppDatabase) {
             )
         }
 
-        dao.insertAll(coord)
+        if (range != "8weeks") {
+            dao.insertAll(coord)
+        }
         return coord
     }
 }
