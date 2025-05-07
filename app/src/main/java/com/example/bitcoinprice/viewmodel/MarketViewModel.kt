@@ -6,8 +6,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.bitcoinprice.data.local.entity.MarketPriceEntity
 import com.example.bitcoinprice.data.repository.MarketRepository
+import com.example.bitcoinprice.ui.data.ScreenUIData
 import kotlinx.coroutines.launch
 
 
@@ -23,10 +23,18 @@ class MarketViewModelFactory(private val repository: MarketRepository) : ViewMod
 
 class MarketViewModel(private val repository: MarketRepository) : ViewModel() {
 
-    private val _marketPrice = mutableStateOf<List<MarketPriceEntity?>>(emptyList())
-    val marketPrice: State<List<MarketPriceEntity?>> = _marketPrice
+    private val _marketPrice = mutableStateOf(
+        ScreenUIData(
+            name = "",
+            description = "",
+            values = emptyList(),
+            isLoading = true,
+            isError = false
+        )
+    )
+    val marketPrice: State<ScreenUIData> = _marketPrice
 
-    fun loadMarketPrice(range: String){
+    fun loadMarketPrice(range: String) {
         val mappedRange = when (range) {
             "3d" -> "3days"
             "4d" -> "4days"
@@ -35,20 +43,30 @@ class MarketViewModel(private val repository: MarketRepository) : ViewModel() {
             "2m" -> "8weeks"
             else -> "4weeks"
         }
+
         Log.d("MarketViewModel", "Chamando loadMarketPrice com: $mappedRange")
         viewModelScope.launch {
+            _marketPrice.value = _marketPrice.value.copy(isLoading = true, isError = false)
+
             try {
                 val response = repository.getMarketPrices(mappedRange)
-                Log.d("MarketViewModel", "Dados recebidos: ${response.size}")
-                _marketPrice.value = response
+                Log.d("MarketViewModel", "Dados recebidos: ${response.values.size}")
+                _marketPrice.value = response.copy(isLoading = false, isError = false)
             } catch (e: Exception) {
-                Log.e("MarketViewModel", "Erro ao carregar preços ${e.message} " , e)
+                Log.e("MarketViewModel", "Erro ao carregar preços ${e.message}", e)
+                _marketPrice.value = ScreenUIData(
+                    name = "",
+                    description = "",
+                    values = emptyList(),
+                    isLoading = false,
+                    isError = true
+                )
             }
         }
 
     }
 
     init {
-        loadMarketPrice("1")
+        loadMarketPrice("1m")
     }
 }

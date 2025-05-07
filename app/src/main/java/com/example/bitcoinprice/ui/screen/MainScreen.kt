@@ -20,67 +20,78 @@ import com.example.bitcoinprice.viewmodel.MarketViewModel
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
 
 
 import java.util.Date
 
 @Composable
 fun MainScreen(viewModel: MarketViewModel) {
-    val data = viewModel.marketPrice.value
-    println("teste")
-    println(viewModel.marketPrice.value)
-
+    val data = viewModel.marketPrice
     val options = listOf("3d", "4d", "7d", "1m", "2m")
     var selected by remember { mutableStateOf("1m") }
 
 
-    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-        val totalHeight = maxHeight
-
-        Column(
-            modifier = Modifier
-                .height(totalHeight * 0.7f)
-                .padding(10.dp)
+    if (data.value.isError) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
         ) {
-            Column(modifier = Modifier.padding(16.dp)
-                .height(totalHeight * 0.1f)) {
-                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    options.forEach { option ->
-                        Button(
-                            onClick = {
-                                selected = option
-                                viewModel.loadMarketPrice(option)
-                            },
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = if (selected == option) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary
-                            )
-                        ) {
-                            Text(option.uppercase())
+            Text(
+                text = "Houve um erro incomum",
+                fontSize = 16.sp,
+                color = Color.Red,
+                fontWeight = FontWeight.Bold
+            )
+        }
+    } else {
+        BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+            val totalHeight = maxHeight
+
+            Column(
+                modifier = Modifier
+                    .height(totalHeight * 0.7f)
+                    .padding(10.dp)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .height(totalHeight * 0.1f)
+                ) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                        options.forEach { option ->
+                            Button(
+                                onClick = {
+                                    selected = option
+                                    viewModel.loadMarketPrice(option)
+                                },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = if (selected == option) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary
+                                )
+                            ) {
+                                Text(option.uppercase())
+                            }
                         }
                     }
                 }
-            }
 
-            Text(
-                "Preço do Bitcoin nas últimas 4 semanas",
-                fontSize = 20.sp,
-                modifier = Modifier.padding(6.dp)
-            )
+                Text(
+                    "Preço do Bitcoin nas últimas 4 semanas",
+                    fontSize = 20.sp,
+                    modifier = Modifier.padding(6.dp)
+                )
 
-            LazyColumn(modifier = Modifier.padding(16.dp)) {
-                items(data) { item ->
-                    Column(
-                        modifier = Modifier
-                            .padding(vertical = 4.dp)
-                            .width(200.dp)
-                    ) {
-                        if (item != null) {
+                LazyColumn(modifier = Modifier.padding(16.dp)) {
+                    items(data.value.values) { item ->
+                        Column(
+                            modifier = Modifier
+                                .padding(vertical = 4.dp)
+                                .width(200.dp)
+                        ) {
                             Text(
                                 text = "Dia: ${Date(item.x * 1000)}",
                                 fontSize = 14.sp
                             )
-                        }
-                        if (item != null) {
                             Text(
                                 text = "Preço: R$ %.2f".format(item.y),
                                 fontSize = 14.sp
@@ -89,26 +100,24 @@ fun MainScreen(viewModel: MarketViewModel) {
                     }
                 }
             }
-        }
 
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(totalHeight * 0.3f)
-                .align(Alignment.BottomStart)
-                .padding(16.dp)
-        ) {
-            Text("About", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(totalHeight * 0.3f)
+                    .align(Alignment.BottomStart)
+                    .padding(16.dp)
+            ) {
+                Text("About", fontSize = 20.sp, fontWeight = FontWeight.Bold)
 
-//            data[0].let {
-//                if (it != null) {
-//                    Text(
-//                        text = it.description,
-//                        fontSize = 14.sp,
-//                        modifier = Modifier.padding(top = 8.dp)
-//                    )
-//                }
-//            }
+                data.let {
+                    Text(
+                        text = data.value.description,
+                        fontSize = 14.sp,
+                        modifier = Modifier.padding(top = 8.dp)
+                    )
+                }
+            }
         }
     }
 }
