@@ -5,8 +5,14 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "market_price")
 data class MarketPriceEntity(
-    @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
+    @PrimaryKey
+    val range: String,
+    val name: String,
+    val description: String,
+    val valores: List<Valor>,
+)
+
+data class Valor(
     val x: Long,
     val y: Float
 )

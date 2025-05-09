@@ -11,6 +11,9 @@ interface MarketPriceDao {
     @Query("SELECT * FROM market_price")
     suspend fun getAll(): List<MarketPriceEntity>
 
+    @Query("SELECT * FROM market_price where range = :range")
+    suspend fun getByRange(range: String): MarketPriceEntity?
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAll(prices: List<MarketPriceEntity>)
+    suspend fun insertAll(prices: MarketPriceEntity)
 }

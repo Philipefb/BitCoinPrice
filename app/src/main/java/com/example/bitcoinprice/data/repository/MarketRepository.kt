@@ -3,42 +3,36 @@ package com.example.bitcoinprice.data.repository
 
 import android.util.Log
 import com.example.bitcoinprice.data.local.database.AppDatabase
-import com.example.bitcoinprice.data.local.entity.MarketInfoEntity
 import com.example.bitcoinprice.data.local.entity.MarketPriceEntity
+import com.example.bitcoinprice.data.local.entity.Valor
 import com.example.bitcoinprice.data.network.RetrofitClient
 import com.example.bitcoinprice.ui.data.Coord
 import com.example.bitcoinprice.ui.data.ScreenUIData
 
 class MarketRepository(private val db: AppDatabase) {
     private val dao = db.marketPriceDao()
-    private val daoInfo = db.marketInfoDao()
 
     suspend fun getMarketPrices(range: String): ScreenUIData {
-        val cachedPrices = dao.getAll()
-        val cachedInfo = daoInfo.getInfo()
-        if (cachedPrices.isNotEmpty() && range != "8weeks") {
+        val cachedPrices = dao.getByRange(range)
+
+        if (cachedPrices != null) {
             Log.d("MarketRepository.kt", "há dados no banco pegando localmente")
-            val screenData = ScreenUIData(
-                name = cachedInfo.name,
-                description = cachedInfo.description,
-                values = cachedPrices.map { Coord(x = it.x, y = it.y) },
+            return ScreenUIData(
+                name = cachedPrices.name,
+                description = cachedPrices.description,
+                values = cachedPrices.valores.map { Coord(x = it.x, y = it.y) },
                 isLoading = false,
                 isError = false
             )
-            return screenData
         }
 
-        val response = RetrofitClient.api.getMarketPrice(range)
-        val infodb = MarketInfoEntity(
-            name = response.name,
+        val response = RetrofitClient.api.getMarketPrice(timespan = range)
+        val datadb = MarketPriceEntity(
+            range = range,
             description = response.description,
+            name = response.name,
+            valores = response.values.map { Valor(x = it.x, y = it.y) }
         )
-        val datadb = response.values.map {
-            MarketPriceEntity(
-                x = it.x,
-                y = it.y
-            )
-        }
 
         val screenData = ScreenUIData(
             name = response.name,
@@ -48,10 +42,8 @@ class MarketRepository(private val db: AppDatabase) {
             isError = false
         )
 
-        daoInfo.insertInfo(infodb)
-        if (range != "8weeks") {
-            dao.insertAll(datadb)
-        }
+        dao.insertAll(datadb)
+
         return screenData
     }
 }

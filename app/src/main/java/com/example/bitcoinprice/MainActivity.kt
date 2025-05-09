@@ -19,14 +19,10 @@ import com.example.bitcoinprice.data.local.database.AppDatabase
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-        val db = Room.databaseBuilder(
-            applicationContext,
-            AppDatabase::class.java,
-            "market_db"
-        ).build()
         super.onCreate(savedInstanceState)
-        val repository = MarketRepository(db)
-        val factory = MarketViewModelFactory(repository)
+
+        val app = application as App
+        val factory = MarketViewModelFactory(app.repository)
         val viewModel = ViewModelProvider(this, factory)[MarketViewModel::class.java]
 
         enableEdgeToEdge()
