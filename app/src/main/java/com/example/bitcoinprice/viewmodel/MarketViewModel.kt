@@ -44,16 +44,16 @@ class MarketViewModel(private val repository: MarketRepository) : ViewModel() {
             else -> "4weeks"
         }
 
-        Log.d("MarketViewModel", "Chamando loadMarketPrice com: $mappedRange")
+//        Log.d("MarketViewModel", "Chamando loadMarketPrice com: $mappedRange")
         viewModelScope.launch {
             _marketPrice.value = _marketPrice.value.copy(isLoading = true, isError = false)
 
             try {
                 val response = repository.getMarketPrices(mappedRange)
-                Log.d("MarketViewModel", "Dados recebidos: ${response.values.size}")
+//                Log.d("MarketViewModel", "Dados recebidos: ${response.values.size}")
                 _marketPrice.value = response.copy(isLoading = false, isError = false)
             } catch (e: Exception) {
-                Log.e("MarketViewModel", "Erro ao carregar preços ${e.message}", e)
+//                Log.e("MarketViewModel", "Erro ao carregar preços ${e.message}", e)
                 _marketPrice.value = ScreenUIData(
                     name = "",
                     description = "",
