@@ -1,5 +1,8 @@
 package com.example.bitcoinprice.ui.screen
 
+import androidx.compose.animation.core.EaseInOutCubic
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -22,15 +25,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 
-
-import java.util.Date
-
 @Composable
 fun MainScreen(viewModel: MarketViewModel) {
     val data = viewModel.marketPrice
     val options = listOf("3d", "4d", "7d", "1m", "2m")
     var selected by remember { mutableStateOf("1m") }
-
 
     if (data.value.isError) {
         Box(
@@ -80,25 +79,7 @@ fun MainScreen(viewModel: MarketViewModel) {
                     fontSize = 20.sp,
                     modifier = Modifier.padding(6.dp)
                 )
-
-                LazyColumn(modifier = Modifier.padding(16.dp)) {
-                    items(data.value.values) { item ->
-                        Column(
-                            modifier = Modifier
-                                .padding(vertical = 4.dp)
-                                .width(200.dp)
-                        ) {
-                            Text(
-                                text = "Dia: ${Date(item.x * 1000)}",
-                                fontSize = 14.sp
-                            )
-                            Text(
-                                text = "Preço: R$ %.2f".format(item.y),
-                                fontSize = 14.sp
-                            )
-                        }
-                    }
-                }
+                    BitcoinLineChart(data.value.values)
             }
 
             Column(

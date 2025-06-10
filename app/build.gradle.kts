@@ -41,6 +41,10 @@ android {
 }
 
 dependencies {
+    //Chart
+//    implementation("io.github.thechance101:chart:Beta-0.0.5")
+    implementation ("io.github.ehsannarmani:compose-charts:0.1.7")
+
     implementation("com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.2")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -74,7 +78,6 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
-    implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
@@ -84,7 +87,6 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
     implementation("com.google.android.material:material:1.11.0")
     implementation("androidx.palette:palette-ktx:1.0.0")
-    implementation("androidx.compose.material3:material3:1.3.1")
     implementation("com.github.bumptech.glide:glide:4.16.0")
     kapt("com.github.bumptech.glide:compiler:4.16.0")
     testImplementation(libs.junit)
